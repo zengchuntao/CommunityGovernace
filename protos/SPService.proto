@@ -1,0 +1,81 @@
+
+syntax = "proto3";
+package SPServiceProto;
+
+
+message RaMsg1 {
+    bytes msg1_t = 1;
+    fixed32 msg1_size = 2;
+    fixed64   id  = 3;
+}
+
+message RaMsg2 {
+    bytes msg2_t = 1;
+    fixed32 msg2_size = 2;
+    fixed64   id  = 3;
+}
+
+message RaMsg3 {
+    bytes msg3_t = 1;
+    fixed32 msg3_size = 2;
+    fixed64   id  = 3;
+}
+
+message Quote {
+    bytes quote_t = 1;
+    fixed32 quote_size = 2;
+    fixed64 id = 3;
+}
+
+message AttestaionResult {
+    enum Result {
+        Trusted = 0;
+        KeyError = 1;
+        MACError = 2;
+        ReportSigError = 3;
+        Untrusted = 4;
+        Failed = 5;
+        Base64Error = 6;
+        IASError = 7;
+        ReportVerifyError = 8;
+        EnclaveIdError = 9;
+        EPIDMismatchError = 10;
+    }
+    bytes  msg4_t = 1;
+    fixed32 msg4_size = 2;
+    Result result = 3;
+    string  reason = 4;
+}
+
+message SessionID {
+    fixed64 id = 1;
+}
+
+message RequestInfo {
+    fixed64 session_id = 1;
+    string request_data_key = 2;
+    bytes  request_cmac = 3;
+    bytes  parameters = 4;
+}
+
+message ReplyData {
+    uint32 status = 1; //0 for sucessful; 1  No Remote Attestation; 2 Attestation Result timeout ; -1 no data
+    string msg = 2;
+    bytes  encrypted_data = 3;
+    bytes  iv = 4;
+    bytes  data_cmac = 5;
+}
+
+message ReplyResult {
+    uint32 status = 1;
+    string msg = 2;
+}
+
+service SPService {
+    rpc GetMsg2(RaMsg1) returns (RaMsg2) {};
+    rpc SendReport(RaMsg3) returns(AttestaionResult) {};
+
+    rpc RequestData(RequestInfo) returns (ReplyData) {};
+    rpc CloseSession(SessionID)  returns (ReplyResult) {}; 
+}
+
